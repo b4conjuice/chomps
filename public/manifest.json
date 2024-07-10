@@ -1,0 +1,8 @@
+{
+  "name": "chomps",
+  "short_name": "chomps",
+  "lang": "en-US",
+  "start_url": "/",
+  "display": "standalone",
+  "scope": "/"
+}
