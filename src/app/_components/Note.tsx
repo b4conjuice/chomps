@@ -8,6 +8,7 @@ import {
   PencilSquareIcon,
 } from '@heroicons/react/24/solid'
 import { useDebounce } from '@uidotdev/usehooks'
+import { toast } from 'react-toastify'
 
 import { Main, Title } from '@/components/ui'
 import Footer, { FooterListItem } from '@/components/ui/footer'
@@ -58,7 +59,7 @@ export default function Note({ note }: { note: Note }) {
         <FooterListItem
           onClick={() => {
             copyToClipboard(body)
-            // toast.success('copied to clipboard')
+            toast.success('copied to clipboard')
           }}
         >
           <DocumentDuplicateIcon className='h-6 w-6' />

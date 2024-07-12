@@ -1,5 +1,7 @@
 import type { Viewport } from 'next'
+import { ToastContainer } from 'react-toastify'
 
+import 'react-toastify/dist/ReactToastify.min.css'
 import '@/styles/globals.css'
 
 const DEFAULT_TITLE = 'chomps'
@@ -27,7 +29,13 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body>
-        <div className='bg-cb-dark-blue text-cb-white flex min-h-screen flex-col'>
+        <div className='flex min-h-screen flex-col bg-cb-dark-blue text-cb-white'>
+          <ToastContainer
+            autoClose={1000}
+            toastClassName='bg-cb-off-blue text-cb-white rounded-lg'
+            bodyClassName=''
+            pauseOnFocusLoss={false}
+          />
           {children}
         </div>
       </body>
