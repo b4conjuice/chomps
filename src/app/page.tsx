@@ -1,8 +1,11 @@
+import { unstable_noStore as noStore } from 'next/cache'
+
 import { Main, Title } from '@/components/ui'
 import Note from './_components/Note'
 import { getNote } from '@/server/queries'
 
 export default async function Home() {
+  noStore()
   const note = await getNote(process.env.NOTE_ID!)
   if (!note) {
     return (
