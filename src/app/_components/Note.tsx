@@ -1,15 +1,38 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { type Note } from '@prisma/client'
-import { ArrowDownOnSquareIcon } from '@heroicons/react/24/solid'
+import {
+  DocumentDuplicateIcon,
+  ListBulletIcon,
+  PencilSquareIcon,
+} from '@heroicons/react/24/solid'
+import { useDebounce } from '@uidotdev/usehooks'
 
 import { Main, Title } from '@/components/ui'
 import Footer, { FooterListItem } from '@/components/ui/footer'
 import { saveNote } from '@/server/queries'
+import useLocalStorage from '@/lib/useLocalStorage'
+import copyToClipboard from '@/lib/copyToClipboard'
 
 export default function Note({ note }: { note: Note }) {
+  const [mode, setMode] = useLocalStorage<'text' | 'list'>('dlp-mode', 'text')
   const [body, setBody] = useState(note.body)
+  const debouncedBody = useDebounce(body, 500)
+
+  useEffect(() => {
+    async function updateNote() {
+      if (note) {
+        const newNote = {
+          ...note,
+          text: `${note?.title ?? ''}\n\n${body}`,
+          body,
+        }
+        await saveNote(newNote)
+      }
+    }
+    void updateNote()
+  }, [debouncedBody])
   return (
     <>
       <Main className='flex flex-col p-4'>
@@ -23,46 +46,22 @@ export default function Note({ note }: { note: Note }) {
         </div>
       </Main>
       <Footer>
-        {/* <FooterListItem
-        onClick={() => {
-          refetch().catch(err => console.log(err))
-        }}
-      >
-        <ArrowPathIcon
-          className={classnames('h-6 w-6', isRefetching && 'animate-spin-slow')}
-        />
-      </FooterListItem>
-      {mode === 'text' ? (
-        <FooterListItem onClick={() => setMode('list')}>
-          <ListBulletIcon className='h-6 w-6' />
-        </FooterListItem>
-      ) : (
-        <FooterListItem onClick={() => setMode('text')}>
-          <PencilSquareIcon className='h-6 w-6' />
-        </FooterListItem>
-      )}
-      <FooterListItem
-        onClick={() => {
-          copyToClipboard(body)
-          toast.success('copied to clipboard')
-        }}
-      >
-        <DocumentDuplicateIcon className='h-6 w-6' />
-      </FooterListItem> */}
+        {/* {mode === 'text' ? (
+          <FooterListItem onClick={() => setMode('list')}>
+            <ListBulletIcon className='h-6 w-6' />
+          </FooterListItem>
+        ) : (
+          <FooterListItem onClick={() => setMode('text')}>
+            <PencilSquareIcon className='h-6 w-6' />
+          </FooterListItem>
+        )} */}
         <FooterListItem
-          onClick={async () => {
-            if (note) {
-              const newNote = {
-                ...note,
-                text: `${note?.title ?? ''}\n\n${body}`,
-                body,
-              }
-              await saveNote(newNote)
-            }
+          onClick={() => {
+            copyToClipboard(body)
+            // toast.success('copied to clipboard')
           }}
-          disabled={body === note?.body}
         >
-          <ArrowDownOnSquareIcon className='h-6 w-6' />
+          <DocumentDuplicateIcon className='h-6 w-6' />
         </FooterListItem>
       </Footer>
     </>
