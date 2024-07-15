@@ -15,6 +15,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@clerk/nextjs": "^5.2.3",
     "@hello-pangea/dnd": "^16.6.0",
     "@heroicons/react": "^2.1.5",
     "@prisma/client": "^5.14.0",

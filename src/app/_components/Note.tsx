@@ -9,6 +9,13 @@ import {
 } from '@heroicons/react/24/solid'
 import { useDebounce } from '@uidotdev/usehooks'
 import { toast } from 'react-toastify'
+import {
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+  useAuth,
+} from '@clerk/nextjs'
 
 import { Main, Title } from '@/components/ui'
 import Footer, { FooterListItem } from '@/components/ui/footer'
@@ -18,6 +25,7 @@ import copyToClipboard from '@/lib/copyToClipboard'
 import DragDropList from '@/components/ui/dragDropList'
 
 export default function Note({ note }: { note: Note }) {
+  const { isSignedIn } = useAuth()
   const [mode, setMode] = useLocalStorage<'text' | 'list'>('dlp-mode', 'text')
   const [body, setBody] = useState(note.body)
   const debouncedBody = useDebounce(body, 500)
@@ -31,15 +39,27 @@ export default function Note({ note }: { note: Note }) {
       }
       await saveNote(newNote)
     }
-    void updateNote()
+    if (isSignedIn) {
+      void updateNote()
+    }
   }, [debouncedBody])
 
   const textAsList = (body ?? '').split('\n')
   return (
     <>
       <Main className='flex flex-col space-y-4 p-4'>
-        <Title>chomps</Title>
-        {mode === 'list' ? (
+        <div className='relative'>
+          <Title>chomps</Title>
+          <div className='absolute right-0 top-0'>
+            <SignedOut>
+              <SignInButton />
+            </SignedOut>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
+          </div>
+        </div>
+        {mode === 'list' && isSignedIn ? (
           <div className='space-y-3'>
             <DragDropList
               items={textAsList
@@ -58,19 +78,26 @@ export default function Note({ note }: { note: Note }) {
           </div>
         ) : (
           <textarea
-            className='h-full w-full flex-grow bg-cobalt'
+            className='h-full w-full flex-grow bg-cobalt disabled:border-none disabled:opacity-75'
             value={body}
             onChange={e => setBody(e.target.value)}
+            disabled={!isSignedIn}
           />
         )}
       </Main>
       <Footer>
         {mode === 'text' ? (
-          <FooterListItem onClick={() => setMode('list')}>
+          <FooterListItem
+            onClick={() => setMode('list')}
+            disabled={!isSignedIn}
+          >
             <ListBulletIcon className='h-6 w-6' />
           </FooterListItem>
         ) : (
-          <FooterListItem onClick={() => setMode('text')}>
+          <FooterListItem
+            onClick={() => setMode('text')}
+            disabled={!isSignedIn}
+          >
             <PencilSquareIcon className='h-6 w-6' />
           </FooterListItem>
         )}
